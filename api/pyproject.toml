@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "pygolf-api"
 version = "0.1.0"
-description = ""
-authors = ["arslee07 <mail@arslee.me>"]
+description = "PyGolf API"
+authors = ["arslee07 <mail@arslee.me>", "igorechek06 <me@igorek.dev>"]
 readme = "README.md"
 packages = [{include = "pygolf_api"}]
 

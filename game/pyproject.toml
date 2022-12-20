@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "pygolf"
 version = "0.1.0"
-description = ""
-authors = ["arslee07 <mail@arslee.me>"]
+description = "PyGolf Game"
+authors = ["arslee07 <mail@arslee.me>", "igorechek06 <me@igorek.dev>"]
 readme = "README.md"
+packages = [{include = "pygolf"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
