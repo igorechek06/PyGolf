@@ -1,0 +1,26 @@
+version: 3
+
+services:
+  pygolf-server:
+    build: "."
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - DATABASE=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pygolf:5432/${POSTGRES_DB}
+    ports:
+      - 5000:5000
+
+  pygolf-database:
+    image: postgres:bullseye
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - pygolf-database:/var/lib/postgresql/data
+
+volumes:
+  pygolf-database:
