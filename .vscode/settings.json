@@ -1,0 +1,7 @@
+{
+  "files.exclude": {
+    "**/.mypy_cache": true,
+    "**/.venv": true
+  },
+  "cSpell.words": ["collidepoint", "MOUSEBUTTONDOWN", "MOUSEBUTTONUP", "pygame"]
+}
