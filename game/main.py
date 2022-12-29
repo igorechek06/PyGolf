@@ -1,18 +1,26 @@
-from random import randint as r
+from random import randint
 
 import pygame as pg
 from engine import Ball, Engine
 from pygame.math import Vector2
 
 engine = Engine(
-    fps=60,
-    fc=1,
-    window=pg.display.set_mode((500, 500), pg.RESIZABLE),
-    balls=[Ball(r(5, 495), r(4, 495)) for _ in range(10)],
+    fps=75,
+    fc=0.4,
+    window=pg.display.set_mode((1000, 1000), pg.RESIZABLE),
+    balls=[Ball(randint(20, 980), randint(20, 980), 20, 10) for _ in range(10)],
 )
 
 x, y = 0.0, 0.0
 ball = None
+
+
+def get_collidepoint_ball(point: tuple[float, float]) -> Ball | None:
+    for ball in engine.balls:
+        if ball.rect.collidepoint(point):
+            return ball
+    return None
+
 
 while True:
     engine.window.fill("black")
@@ -21,21 +29,21 @@ while True:
         if e.type == pg.QUIT:
             exit()
         elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-            ball = engine.get_collidepoint_ball(e.pos)
+            ball = get_collidepoint_ball(e.pos)
             if ball is not None:
                 x, y = ball.pos
         elif e.type == pg.MOUSEMOTION and ball is not None:
             x, y = e.pos
         elif e.type == pg.MOUSEBUTTONUP and e.button == 1:
             if ball is not None:
-                ball.velocity += Vector2(x - ball.x, y - ball.y) * 5
+                ball.velocity += Vector2(x - ball.x, y - ball.y).normalize() * 1000
                 ball = None
 
     if ball is not None:
-        pg.draw.line(engine.window, (255, 0, 0), ball.pos, (x, y))
+        pg.draw.line(engine.window, "red", ball.pos, (x, y))
 
-    engine.draw()
+    for b in engine.balls:
+        pg.draw.circle(engine.window, "white", (b.x, b.y), b.radius)
 
     pg.display.flip()
     engine.tick()
-

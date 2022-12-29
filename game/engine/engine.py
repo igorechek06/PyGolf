@@ -1,4 +1,4 @@
-from math import sqrt
+from math import cos, pi
 
 import pygame as pg
 from pygame.math import Vector2
@@ -26,28 +26,56 @@ class Engine:
         self.clock = pg.time.Clock()
         self.balls = balls
 
-    def draw(self) -> None:
-        for ball in self.balls:
-            pg.draw.circle(self.window, (255, 255, 255), (ball.x, ball.y), 5)
-
-    def get_collidepoint_ball(self, point: tuple[float, float]) -> Ball | None:
-        for ball in self.balls:
-            if pg.Rect(ball.x - 5, ball.y - 5, 10, 10).collidepoint(point):
-                return ball
-        return None
-
     def tick(self) -> None:
         t = self.clock.tick(self.fps) / 1000
 
         for ball in self.balls:
-            if ball.velocity.length() != 0:
-                a = -ball.velocity.normalize() * self.fc * 9.8
+            for collide_ball in self.balls:
+                if ball is collide_ball or not ball.collide_ball(collide_ball):
+                    continue
 
-                if ball.x + 5 >= self.window.get_width() or ball.x - 5 <= 0:
+                b1 = ball
+                b2 = collide_ball
+                x1 = Vector2(b1.pos)
+                x2 = Vector2(b2.pos)
+
+                v1 = b1.velocity - (
+                    ((2 * b2.mass) / (b1.mass + b2.mass))
+                    * (
+                        ((b1.velocity - b2.velocity).dot(x1 - x2))
+                        / (x1 - x2).length_squared()
+                    )
+                    * (x1 - x2)
+                )
+                v2 = b2.velocity - (
+                    ((2 * b1.mass) / (b1.mass + b2.mass))
+                    * (
+                        ((b2.velocity - b1.velocity).dot(x2 - x1))
+                        / (x2 - x1).length_squared()
+                    )
+                    * (x2 - x1)
+                )
+
+                b1.velocity = v1
+                b2.velocity = v2
+
+            if ball.velocity.length() != 0:
+                if (
+                    ball.x + ball.radius >= self.window.get_width()
+                    and ball.velocity.x > 0
+                    or ball.x - ball.radius <= 0
+                    and ball.velocity.x < 0
+                ):
                     ball.velocity.reflect_ip(Vector2(1, 0))
-                if ball.y + 5 >= self.window.get_height() or ball.y - 5 <= 0:
+                if (
+                    ball.y + ball.radius >= self.window.get_height()
+                    and ball.velocity.y > 0
+                    or ball.y - ball.radius <= 0
+                    and ball.velocity.y < 0
+                ):
                     ball.velocity.reflect_ip(Vector2(0, 1))
 
+                a = -ball.velocity.normalize() * self.fc * 9.8
                 ball.x += ball.velocity.x * t + (a.x * t**2) / 2
                 ball.y += ball.velocity.y * t + (a.y * t**2) / 2
                 ball.velocity += a
