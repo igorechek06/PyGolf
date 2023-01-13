@@ -6,21 +6,30 @@ authors = ["arslee07 <mail@arslee.me>", "igorechek06 <me@igorek.dev>"]
 license = "GPL-3.0-only"
 readme = "README.md"
 
+
 [tool.poetry.dependencies]
 python = "^3.10"
-
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^0.991"
 black = "^22.12.0"
 isort = "^5.11.4"
 
-
 [tool.poetry.group.game.dependencies]
 pygame = "^2.1.2"
-
+pydantic = "^1.10.4"
 
 [tool.poetry.group.server.dependencies]
-Flask = "^2.2.2"
+fastapi = "^0.89.1"
+pydantic = "^1.10.4"
 SQLAlchemy = "2b4"
 
+
+[tool.mypy]
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_untyped_calls = true
+
+
+[tool.isort]
+profile = "black"
