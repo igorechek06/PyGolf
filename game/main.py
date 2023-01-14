@@ -31,19 +31,19 @@ while True:
         elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
             ball = get_collidepoint_ball(e.pos)
             if ball is not None:
-                x, y = ball.pos
+                x, y = ball.pos.x, ball.pos.y
         elif e.type == pg.MOUSEMOTION and ball is not None:
             x, y = e.pos
         elif e.type == pg.MOUSEBUTTONUP and e.button == 1:
             if ball is not None:
-                ball.velocity += Vector2(x - ball.x, y - ball.y).normalize() * 1000
+                ball.velocity += Vector2(x - ball.pos.x, y - ball.pos.y) * 3
                 ball = None
 
     if ball is not None:
         pg.draw.line(engine.window, "red", ball.pos, (x, y))
 
     for b in engine.balls:
-        pg.draw.circle(engine.window, "white", (b.x, b.y), b.radius)
+        pg.draw.circle(engine.window, "white", (b.pos.x, b.pos.y), b.radius)
 
     pg.display.flip()
     engine.tick()

@@ -1,12 +1,9 @@
-from math import sqrt
-
 import pygame as pg
 from pygame.math import Vector2
 
 
 class Ball:
-    x: float
-    y: float
+    pos: Vector2
     radius: float
     mass: float
     velocity: Vector2
@@ -19,24 +16,22 @@ class Ball:
         mass: float,
         velocity: Vector2 | None = None,
     ) -> None:
-        self.x = x
-        self.y = y
+        self.pos = Vector2(x, y)
         self.radius = radius
         self.mass = mass
         self.velocity = Vector2() if velocity is None else velocity
 
     @property
-    def pos(self) -> tuple[float, float]:
-        return (self.x, self.y)
-
-    @property
     def rect(self) -> pg.Rect:
         return pg.Rect(
-            self.x - self.radius, self.y - self.radius, self.radius * 2, self.radius * 2
+            self.pos.x - self.radius,
+            self.pos.y - self.radius,
+            self.radius * 2,
+            self.radius * 2,
         )
 
     def collide_ball(self, ball: "Ball") -> bool:
         return (
-            sqrt((self.x - ball.x) ** 2 + (self.y - ball.y) ** 2)
-            <= self.radius + ball.radius
+            ball is not self
+            and Vector2(self.pos - ball.pos).length() <= self.radius + ball.radius
         )
