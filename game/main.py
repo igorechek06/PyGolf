@@ -11,7 +11,24 @@ engine = Engine(
         size=course.Size(width=500, height=500),
         start=course.Point(x=250, y=450),
         finish=course.Point(x=250, y=50),
-        walls=[],
+        walls=[
+            course.Wall(
+                start=course.Point(x=225, y=25),
+                end=course.Point(x=275, y=25),
+            ),
+            course.Wall(
+                start=course.Point(x=225, y=25),
+                end=course.Point(x=225, y=75),
+            ),
+            course.Wall(
+                start=course.Point(x=225, y=75),
+                end=course.Point(x=350, y=75),
+            ),
+            course.Wall(
+                start=course.Point(x=350, y=75),
+                end=course.Point(x=450, y=175),
+            ),
+        ],
         zones=[
             course.FrictionZone(
                 pos=course.Point(x=0, y=225),
@@ -19,7 +36,7 @@ engine = Engine(
                 fc=2,
             ),
             course.DeadZone(
-                pos=course.Point(x=0, y=490),
+                pos=course.Point(x=0, y=0),
                 size=course.Size(width=500, height=10),
             ),
         ],
@@ -48,7 +65,7 @@ while True:
         if e.type == pg.MOUSEBUTTONUP:
             mx, my = pg.mouse.get_pos()
             mx, my = mx - sx, my - sy
-            ball.velocity = Vector2(mx - ball.pos.x, my - ball.pos.y) * 2
+            ball.velocity += Vector2(mx - ball.pos.x, my - ball.pos.y) * 2
             trace = False
 
     if trace:

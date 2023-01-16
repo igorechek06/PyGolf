@@ -1,3 +1,6 @@
+from functools import wraps
+from typing import Callable
+
 import pygame as pg
 from pygame.math import Vector2
 
@@ -32,6 +35,9 @@ class Engine:
                 color = "red"
             pg.draw.rect(surface, color, zone.rect)
 
+        for wall in self.course.walls:
+            pg.draw.line(surface, "gray", wall.start.point, wall.end.point, 5)
+
         for ball in self.balls:
             pg.draw.circle(surface, "white", ball.pos, ball.radius)
 
@@ -50,6 +56,37 @@ class Engine:
                     elif isinstance(zone, DeadZone):
                         ball.velocity = Vector2()
                         ball.pos = Vector2(self.course.start.point)
+
+            if ball.velocity.length() != 0:
+                if (
+                    ball.pos.x + ball.radius >= self.course.size.width
+                    and ball.velocity.x > 0
+                    or ball.pos.x - ball.radius <= 0
+                    and ball.velocity.x < 0
+                ):
+                    ball.velocity.reflect_ip(Vector2(1, 0))
+                if (
+                    ball.pos.y + ball.radius >= self.course.size.height
+                    and ball.velocity.y > 0
+                    or ball.pos.y - ball.radius <= 0
+                    and ball.velocity.y < 0
+                ):
+                    ball.velocity.reflect_ip(Vector2(0, 1))
+
+                for wall in self.course.walls:
+                    if ball.collide_line((wall.start.point, wall.end.point)):
+                        ball.velocity.reflect_ip(
+                            Vector2(
+                                wall.end.y - wall.start.y, -(wall.end.x - wall.start.x)
+                            )
+                        )
+
+                a = -ball.velocity.normalize() * fc * 9.8
+                ball.pos += ball.velocity * t + (a * t**2) / 2
+                ball.velocity += a
+
+                if ball.velocity.length() - a.length() <= 0:
+                    ball.velocity = Vector2()
 
             for collided_ball in filter(lambda b: b.collide_ball(ball), self.balls):
                 b1 = ball
@@ -74,26 +111,3 @@ class Engine:
 
                 b1.velocity = v1
                 b2.velocity = v2
-
-            if ball.velocity.length() != 0:
-                if (
-                    ball.pos.x + ball.radius >= self.course.size.width
-                    and ball.velocity.x > 0
-                    or ball.pos.x - ball.radius <= 0
-                    and ball.velocity.x < 0
-                ):
-                    ball.velocity.reflect_ip(Vector2(1, 0))
-                if (
-                    ball.pos.y + ball.radius >= self.course.size.height
-                    and ball.velocity.y > 0
-                    or ball.pos.y - ball.radius <= 0
-                    and ball.velocity.y < 0
-                ):
-                    ball.velocity.reflect_ip(Vector2(0, 1))
-
-                a = -ball.velocity.normalize() * fc * 9.8
-                ball.pos += ball.velocity * t + (a * t**2) / 2
-                ball.velocity += a
-
-                if ball.velocity.length() - a.length() <= 0:
-                    ball.velocity = Vector2()
