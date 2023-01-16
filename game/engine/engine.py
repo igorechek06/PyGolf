@@ -15,6 +15,8 @@ class Engine:
     balls: list[Ball]
     clock: pg.time.Clock
 
+    finish_handlers: list[Callable[[Ball], None]]
+
     def __init__(self, fps: int, course: GolfCourse) -> None:
         self.fps = fps
         self.course = course
@@ -22,11 +24,17 @@ class Engine:
         self.balls = []
         self.clock = pg.time.Clock()
 
+        self.finish_handlers = []
+
+    def set_finish_handler(
+        self, func: Callable[[Ball], None]
+    ) -> Callable[[Ball], None]:
+        self.finish_handlers.append(func)
+        return func
+
     # Render
     def render(self) -> pg.surface.Surface:
         surface = pg.surface.Surface(self.course.size.size)
-
-        pg.draw.circle(surface, "green", self.course.finish.point, 10)
 
         for zone in self.course.zones:
             if isinstance(zone, FrictionZone):
@@ -39,6 +47,8 @@ class Engine:
 
         for wall in self.course.walls:
             pg.draw.line(surface, "gray", wall.start.point, wall.end.point, 5)
+
+        pg.draw.circle(surface, "green", self.course.finish.point, 10)
 
         for ball in self.balls:
             pg.draw.circle(surface, "white", ball.pos, ball.radius)
@@ -89,6 +99,13 @@ class Engine:
 
                 if ball.velocity.length() - a.length() <= 0:
                     ball.velocity = Vector2()
+
+            if (
+                ball.rect.collidepoint(self.course.finish.point)
+                and ball.velocity.length() <= 500
+            ):
+                for handler in self.finish_handlers:
+                    handler(ball)
 
             for collided_ball in filter(lambda b: b.collide_ball(ball), self.balls):
                 b1 = ball

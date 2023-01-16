@@ -1,21 +1,29 @@
+from tkinter import filedialog
+
 import pygame as pg
 from engine import Ball, Engine, course
 from pygame.math import Vector2
-from tkinter import filedialog
 
 
 def run(window: pg.surface.Surface) -> None:
-    engine = Engine(
-        fps=60,
-        course=course.GolfCourse.parse_file(filedialog.askopenfilename()),
-    )
+    f = filedialog.askopenfilename(filetypes=[("PyGolf Level", "*.pygolf")])
+    if f is None:
+        return
+
+    engine = Engine(fps=120, course=course.GolfCourse.parse_file(f))
 
     ball = Ball(*engine.course.start.point, 10, 10)
     engine.balls.append(ball)
 
     trace = False
+    work = True
 
-    while True:
+    @engine.set_finish_handler
+    def end_game(ball: Ball) -> None:
+        nonlocal work
+        work = False
+
+    while work:
         window.fill("gray")
 
         surface = engine.render()
@@ -24,13 +32,13 @@ def run(window: pg.surface.Surface) -> None:
 
         for e in pg.event.get():
             if e.type == pg.QUIT:
-                return
-            if e.type == pg.MOUSEBUTTONDOWN:
+                work = False
+            if e.type == pg.MOUSEBUTTONDOWN and ball.velocity.length() == 0:
                 trace = True
-            if e.type == pg.MOUSEBUTTONUP:
+            if e.type == pg.MOUSEBUTTONUP and trace:
                 mx, my = pg.mouse.get_pos()
                 mx, my = mx - sx, my - sy
-                ball.velocity = Vector2(mx - ball.pos.x, my - ball.pos.y) * 2
+                ball.velocity += Vector2(mx - ball.pos.x, my - ball.pos.y) * 2
                 trace = False
 
         if trace:

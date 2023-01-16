@@ -1,8 +1,8 @@
 from enum import Enum
+from tkinter import filedialog
 
 import pygame as pg
 from engine import course
-from tkinter import filedialog
 
 
 class EditorState(Enum):
@@ -14,9 +14,6 @@ class EditorState(Enum):
 
 
 def render_course(surface: pg.surface.Surface, crs: course.GolfCourse) -> None:
-    pg.draw.circle(surface, "white", crs.start.point, 10)
-    pg.draw.circle(surface, "green", crs.finish.point, 10)
-
     for zone in crs.zones:
         if isinstance(zone, course.FrictionZone):
             color = "yellow"
@@ -26,6 +23,9 @@ def render_course(surface: pg.surface.Surface, crs: course.GolfCourse) -> None:
 
     for wall in crs.walls:
         pg.draw.line(surface, "gray", wall.start.point, wall.end.point, 5)
+
+    pg.draw.circle(surface, "green", crs.finish.point, 10)
+    pg.draw.circle(surface, "white", crs.start.point, 10)
 
 
 def render_preview(
@@ -133,7 +133,9 @@ def run(window: pg.surface.Surface) -> None:
                         crs.zones.pop()
 
                 if e.key == pg.K_RETURN:
-                    f = filedialog.asksaveasfile("w", filetypes=[('PyGolf Level', '*.pygolf')])
+                    f = filedialog.asksaveasfile(
+                        "w", filetypes=[("PyGolf Level", "*.pygolf")]
+                    )
                     if f is not None:
                         f.write(crs.json())
                         f.close()
@@ -149,6 +151,13 @@ def run(window: pg.surface.Surface) -> None:
                     current_state = EditorState.friction_zone
                 if e.key == pg.K_5:
                     current_state = EditorState.dead_zone
+                if e.key == pg.K_o:
+                    fo = filedialog.askopenfilename(
+                        filetypes=[("PyGolf Level", "*.pygolf")]
+                    )
+                    if fo is not None:
+                        crs = course.GolfCourse.parse_file(fo)
+                        pg.event.clear(pg.KEYDOWN)
 
             if e.type == pg.QUIT:
                 return
@@ -158,8 +167,10 @@ def run(window: pg.surface.Surface) -> None:
             render_preview(
                 surface,
                 course.Point(x=current_point[0], y=current_point[1]),
-                course.Point(x=pg.mouse.get_pos()[0] - sx, y=pg.mouse.get_pos()[1] - sy),
-                current_state
+                course.Point(
+                    x=pg.mouse.get_pos()[0] - sx, y=pg.mouse.get_pos()[1] - sy
+                ),
+                current_state,
             )
 
         window.blit(surface, (sx, sy))
