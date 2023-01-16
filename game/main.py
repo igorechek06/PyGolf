@@ -1,49 +1,61 @@
 from random import randint
 
 import pygame as pg
-from engine import Ball, Engine
+from engine import Ball, Engine, course
 from pygame.math import Vector2
 
 engine = Engine(
     fps=75,
-    fc=0.4,
-    window=pg.display.set_mode((1000, 1000), pg.RESIZABLE),
-    balls=[Ball(randint(20, 980), randint(20, 980), 20, 10) for _ in range(10)],
+    course=course.GolfCourse(
+        fc=0.2,
+        size=course.Size(width=500, height=500),
+        start=course.Point(x=250, y=450),
+        finish=course.Point(x=250, y=50),
+        walls=[],
+        zones=[
+            course.FrictionZone(
+                pos=course.Point(x=0, y=225),
+                size=course.Size(width=500, height=25),
+                fc=2,
+            ),
+            course.DeadZone(
+                pos=course.Point(x=0, y=490),
+                size=course.Size(width=500, height=10),
+            ),
+        ],
+    ),
 )
 
-x, y = 0.0, 0.0
-ball = None
+window = pg.display.set_mode((750, 750), pg.RESIZABLE)
 
+ball = Ball(250, 450, 10, 10)
+engine.balls.append(ball)
 
-def get_collidepoint_ball(point: tuple[float, float]) -> Ball | None:
-    for ball in engine.balls:
-        if ball.rect.collidepoint(point):
-            return ball
-    return None
-
+trace = False
 
 while True:
-    engine.window.fill("black")
+    window.fill("gray")
+
+    surface = engine.render()
+    sx = (window.get_width() - surface.get_width()) // 2
+    sy = (window.get_height() - surface.get_height()) // 2
 
     for e in pg.event.get():
         if e.type == pg.QUIT:
             exit()
-        elif e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-            ball = get_collidepoint_ball(e.pos)
-            if ball is not None:
-                x, y = ball.pos.x, ball.pos.y
-        elif e.type == pg.MOUSEMOTION and ball is not None:
-            x, y = e.pos
-        elif e.type == pg.MOUSEBUTTONUP and e.button == 1:
-            if ball is not None:
-                ball.velocity += Vector2(x - ball.pos.x, y - ball.pos.y) * 3
-                ball = None
+        if e.type == pg.MOUSEBUTTONDOWN:
+            trace = True
+        if e.type == pg.MOUSEBUTTONUP:
+            mx, my = pg.mouse.get_pos()
+            mx, my = mx - sx, my - sy
+            ball.velocity = Vector2(mx - ball.pos.x, my - ball.pos.y) * 2
+            trace = False
 
-    if ball is not None:
-        pg.draw.line(engine.window, "red", ball.pos, (x, y))
+    if trace:
+        mx, my = pg.mouse.get_pos()
+        pg.draw.line(surface, "blue", ball.pos, (mx - sx, my - sy))
 
-    for b in engine.balls:
-        pg.draw.circle(engine.window, "white", (b.pos.x, b.pos.y), b.radius)
+    window.blit(surface, (sx, sy))
 
     pg.display.flip()
     engine.tick()

@@ -2,32 +2,55 @@ import pygame as pg
 from pygame.math import Vector2
 
 from .ball import Ball
+from .course import DeadZone, FrictionZone, GolfCourse
 
 
 class Engine:
     fps: int
-    fc: float  # Friction coefficient
-    window: pg.surface.Surface
-    clock: pg.time.Clock
+    course: GolfCourse
+
     balls: list[Ball]
+    clock: pg.time.Clock
 
-    def __init__(
-        self,
-        fps: int,
-        fc: float,
-        window: pg.surface.Surface,
-        balls: list[Ball],
-    ) -> None:
+    def __init__(self, fps: int, course: GolfCourse) -> None:
         self.fps = fps
-        self.fc = fc
-        self.window = window
-        self.clock = pg.time.Clock()
-        self.balls = balls
+        self.course = course
 
+        self.balls = []
+        self.clock = pg.time.Clock()
+
+    # Render
+    def render(self) -> pg.surface.Surface:
+        surface = pg.surface.Surface(self.course.size.size)
+
+        pg.draw.circle(surface, "green", self.course.finish.point, 10)
+
+        for zone in self.course.zones:
+            if isinstance(zone, FrictionZone):
+                color = "yellow"
+            elif isinstance(zone, DeadZone):
+                color = "red"
+            pg.draw.rect(surface, color, zone.rect)
+
+        for ball in self.balls:
+            pg.draw.circle(surface, "white", ball.pos, ball.radius)
+
+        return surface
+
+    # Calc
     def tick(self) -> None:
         t = self.clock.tick(self.fps) / 1000
 
         for ball in self.balls:
+            fc = self.course.fc
+            for zone in self.course.zones:
+                if zone.rect.colliderect(ball.rect):
+                    if isinstance(zone, FrictionZone):
+                        fc = zone.fc
+                    elif isinstance(zone, DeadZone):
+                        ball.velocity = Vector2()
+                        ball.pos = Vector2(self.course.start.point)
+
             for collided_ball in filter(lambda b: b.collide_ball(ball), self.balls):
                 b1 = ball
                 b2 = collided_ball
@@ -51,25 +74,24 @@ class Engine:
 
                 b1.velocity = v1
                 b2.velocity = v2
-                break
 
             if ball.velocity.length() != 0:
                 if (
-                    ball.pos.x + ball.radius >= self.window.get_width()
+                    ball.pos.x + ball.radius >= self.course.size.width
                     and ball.velocity.x > 0
                     or ball.pos.x - ball.radius <= 0
                     and ball.velocity.x < 0
                 ):
                     ball.velocity.reflect_ip(Vector2(1, 0))
                 if (
-                    ball.pos.y + ball.radius >= self.window.get_height()
+                    ball.pos.y + ball.radius >= self.course.size.height
                     and ball.velocity.y > 0
                     or ball.pos.y - ball.radius <= 0
                     and ball.velocity.y < 0
                 ):
                     ball.velocity.reflect_ip(Vector2(0, 1))
 
-                a = -ball.velocity.normalize() * self.fc * 9.8
+                a = -ball.velocity.normalize() * fc * 9.8
                 ball.pos += ball.velocity * t + (a * t**2) / 2
                 ball.velocity += a
 
