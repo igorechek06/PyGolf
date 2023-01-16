@@ -1,3 +1,6 @@
+from enum import IntEnum, auto
+from typing import Literal
+
 from pydantic import BaseModel
 from pygame import Rect
 
@@ -25,7 +28,13 @@ class Wall(BaseModel):
     end: Point
 
 
+class ZoneType(IntEnum):
+    FRICTION = auto()
+    DEAD = auto()
+
+
 class Zone(BaseModel):
+    zone_type: ZoneType
     pos: Point
     size: Size
 
@@ -35,11 +44,12 @@ class Zone(BaseModel):
 
 
 class FrictionZone(Zone):
+    zone_type: Literal[ZoneType.FRICTION] = ZoneType.FRICTION
     fc: float
 
 
 class DeadZone(Zone):
-    pass
+    zone_type: Literal[ZoneType.DEAD] = ZoneType.DEAD
 
 
 class GolfCourse(BaseModel):
@@ -50,4 +60,4 @@ class GolfCourse(BaseModel):
     finish: Point
 
     walls: list[Wall] = []
-    zones: list[Zone] = []
+    zones: list[FrictionZone | DeadZone] = []

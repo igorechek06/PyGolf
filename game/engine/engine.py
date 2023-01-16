@@ -33,6 +33,8 @@ class Engine:
                 color = "yellow"
             elif isinstance(zone, DeadZone):
                 color = "red"
+            else:
+                print(zone, type(zone))
             pg.draw.rect(surface, color, zone.rect)
 
         for wall in self.course.walls:
