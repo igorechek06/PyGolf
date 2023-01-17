@@ -26,6 +26,7 @@ class Engine:
 
         self.finish_handlers = []
 
+    # Handlers
     def set_finish_handler(
         self, func: Callable[[Ball], None]
     ) -> Callable[[Ball], None]:

@@ -44,7 +44,7 @@ class Ball:
     ) -> bool:
         return (
             min(line[0][0], line[1][0]) <= self.pos.x <= max(line[0][0], line[1][0])
-            or min(line[0][1], line[1][1]) <= self.pos.y <= max(line[0][1], line[1][1])
+            and min(line[0][1], line[1][1]) <= self.pos.y <= max(line[0][1], line[1][1])
         ) and abs(
             (line[1][0] - line[0][0]) * (line[0][1] - self.pos.y)
             - (line[0][0] - self.pos.x) * (line[1][1] - line[0][1])
