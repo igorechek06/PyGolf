@@ -4,9 +4,7 @@
 
 ## Установка
 
-~~Вы можете [скачать](https://github.com/igorechek06/PyGolf/releases) исполняемый файл из релизов в GitHub.~~
-
-Пока не можете
+Вы можете [скачать](https://github.com/igorechek06/PyGolf/releases) исполняемый файл из релизов в GitHub.
 
 ## Запуск
 
