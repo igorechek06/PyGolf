@@ -1,6 +1,9 @@
+from math import sqrt
+
 import models
 import pygame as pg
 import src
+from pygame.math import Vector2
 
 from . import Ball, DeadZone, FrictionZone, Sprite, Wall, Zone
 
@@ -10,6 +13,7 @@ def zone(zone: models.Zone) -> Zone:
         return FrictionZone(zone.friction, zone.pos.point, zone.size.size)
     elif isinstance(zone, models.DeadZone):
         return DeadZone(zone.pos.point, zone.size.size)
+    raise TypeError
 
 
 class Finish(Sprite):
@@ -68,8 +72,8 @@ class Course:
                 if isinstance(zone, FrictionZone):
                     friction = zone.friction
                 if isinstance(zone, DeadZone):
-                    ball.velocity = pg.math.Vector2()
-                    ball.pos = pg.math.Vector2(self.model.start.point)
+                    ball.velocity = Vector2()
+                    ball.pos = Vector2(self.model.start.point)
                     ball.rect = ball.get_rect()
 
             for collided_ball in self.balls:
@@ -109,18 +113,29 @@ class Course:
                 or ball.pos.x - ball.radius <= 0
                 and ball.velocity.x < 0
             ):
-                ball.velocity.reflect_ip(pg.math.Vector2(1, 0))
+                ball.velocity.reflect_ip(Vector2(1, 0))
             if (
                 ball.pos.y + ball.radius >= self.model.size.height
                 and ball.velocity.y > 0
                 or ball.pos.y - ball.radius <= 0
                 and ball.velocity.y < 0
             ):
-                ball.velocity.reflect_ip(pg.math.Vector2(0, 1))
+                ball.velocity.reflect_ip(Vector2(0, 1))
 
-            # for wall in self.walls:
-            #     collide = pg.sprite.collide_mask(wall, ball)
-            #     if collide is None:
-            #         continue
+            for wall in self.walls:
+                collide = pg.sprite.collide_mask(wall, ball)
+                if collide is None:
+                    continue
+                (x1, y1), (x2, y2) = min(
+                    zip(wall.points, wall.points[-1:] + wall.points[:-1]),
+                    key=lambda line: abs(
+                        (line[1][0] - line[0][0]) * (line[0][1] - ball.pos.y)
+                        - (line[0][0] - ball.pos.x) * (line[1][1] - line[0][1])
+                    )
+                    / sqrt(
+                        (line[1][0] - line[0][0]) ** 2 + (line[1][1] - line[0][1]) ** 2
+                    ),
+                )
+                ball.velocity.reflect_ip(Vector2(y2 - y1, -(x2 - x1)))
 
             ball.update(time, friction)

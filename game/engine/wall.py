@@ -8,6 +8,7 @@ x, y = lambda p: p[0], lambda p: p[1]
 class Wall(Sprite):
     color: tuple[int, int, int]
     points: list[tuple[int, int]]
+    rel_points: list[tuple[int, int]]
 
     def __init__(
         self,
@@ -18,10 +19,11 @@ class Wall(Sprite):
         xmax, ymax = max(points, key=x)[0], max(points, key=y)[1]
 
         self.color = color
-        self.points = [(p[0] - xmin, p[1] - ymin) for p in points]
+        self.points = points
+        self.rel_points = [(p[0] - xmin, p[1] - ymin) for p in self.points]
 
         rect = pg.rect.Rect(xmin, ymin, xmax - xmin, ymax - ymin)
         image = pg.surface.Surface(rect.size, pg.SRCALPHA)
-        pg.draw.polygon(image, self.color, self.points)
+        pg.draw.polygon(image, self.color, self.rel_points)
 
         super().__init__(image, rect)
