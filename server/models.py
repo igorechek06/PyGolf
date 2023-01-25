@@ -3,9 +3,9 @@ from enum import IntEnum, auto
 from pydantic import BaseModel
 
 
-class User(BaseModel):
-    id: int
-    username: str
+class OrmModel(BaseModel):
+    class Config:
+        orm_mode = True
 
 
 class Point(BaseModel):
@@ -72,3 +72,15 @@ class Course(BaseModel):
 
     walls: list[Wall] = []
     zone: list[FrictionZone | DeadZone] = []
+
+
+class User(OrmModel):
+    id: int
+    username: str
+
+
+class Level(OrmModel):
+    id: int
+    owner: User
+    name: str
+    course: Course

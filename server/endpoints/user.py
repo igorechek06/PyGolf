@@ -76,20 +76,14 @@ async def get(id: int) -> m.User | None:
     with db.session.begin() as session:
         user = session.get(db.User, id)
         if user is not None:
-            return m.User(
-                id=user.id,
-                username=user.username,
-            )
+            return m.User.from_orm(user)
         else:
             return None
 
 
 @router.get("/me")
 async def me(user: db.User = Depends(dependencies.auth)) -> m.User:
-    return m.User(
-        id=user.id,
-        username=user.username,
-    )
+    return m.User.from_orm(user)
 
 
 @router.put("/update/username")
