@@ -1,3 +1,5 @@
+from random import randint
+
 import collision
 import models
 import pygame as pg
@@ -59,7 +61,12 @@ class Course:
         return surface
 
     def add_ball(self) -> Ball:
-        ball = Ball(self.model.start.point, 10, 5)
+        ball = Ball(
+            self.model.start.point,
+            10,
+            5,
+            (randint(0, 255), randint(0, 255), randint(0, 255)),
+        )
         self.balls.append(ball)
         return ball
 

@@ -1,4 +1,3 @@
-from random import randint
 
 import pygame as pg
 import src
@@ -11,6 +10,7 @@ class Ball(Sprite):
     pos: Vector2
     radius: int
     mass: float
+    color: tuple[int, int, int]
     velocity: Vector2
 
     def __init__(
@@ -18,17 +18,19 @@ class Ball(Sprite):
         pos: tuple[int, int],
         radius: int,
         mass: float,
+        color: tuple[int, int, int],
         velocity: Vector2 | None = None,
     ) -> None:
         self.pos = Vector2(pos)
         self.radius = radius
         self.mass = mass
+        self.color = color
         self.velocity = Vector2() if velocity is None else velocity
 
         image = pg.surface.Surface((self.radius * 2, self.radius * 2), pg.SRCALPHA)
         pg.draw.circle(
             image,
-            (randint(0, 255), randint(0, 255), randint(0, 255)),
+            color,
             (self.radius, self.radius),
             self.radius - 1,
         )
