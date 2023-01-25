@@ -32,12 +32,10 @@ class Color(BaseModel):
 
 
 class Wall(BaseModel):
+    start: Point
+    end: Point
     color: Color
-    polygon: list[Point]
-
-    @property
-    def wall(self) -> list[tuple[int, int]]:
-        return [p.point for p in self.polygon]
+    width: int = 5
 
 
 class ZoneType(IntEnum):

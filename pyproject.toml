@@ -18,6 +18,7 @@ isort = "^5.11.4"
 [tool.poetry.group.game.dependencies]
 pygame = "^2.1.2"
 pydantic = "^1.10.4"
+collision = "^1.2.2"
 
 [tool.poetry.group.server.dependencies]
 fastapi = "^0.89.1"

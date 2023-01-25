@@ -43,14 +43,5 @@ class Ball(Sprite):
             self.pos - Vector2(self.radius), (self.radius * 2, self.radius * 2)
         )
 
-    def update(self, time: float, friction: float) -> None:
-        if self.velocity.length() != 0:
-
-            acceleration = -self.velocity.normalize() * friction * 9.8
-            self.pos += self.velocity * time + (acceleration * time**2) / 2
-            self.velocity += acceleration
-
-            if self.velocity.length() - acceleration.length() <= 0:
-                self.velocity = Vector2()
-
-            self.rect = self.get_rect()
+    def update(self) -> None:
+        self.rect = self.get_rect()

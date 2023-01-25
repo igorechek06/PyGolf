@@ -1,5 +1,4 @@
-from math import sqrt
-
+import collision
 import models
 import pygame as pg
 import src
@@ -42,7 +41,10 @@ class Course:
 
         self.finish = Finish(self.model.finish.point)
         self.balls = []
-        self.walls = [Wall(w.color.color, w.wall) for w in model.walls]
+        self.walls = [
+            Wall(w.start.point, w.end.point, w.color.color, w.width)
+            for w in model.walls
+        ]
         self.zones = [zone(z) for z in model.zone]
         self.clock = pg.time.Clock()
 
@@ -66,6 +68,7 @@ class Course:
 
         for ball in self.balls:
             friction = self.model.friction
+
             for zone in self.zones:
                 if not pg.sprite.collide_mask(zone, ball):
                     continue
@@ -74,7 +77,7 @@ class Course:
                 if isinstance(zone, DeadZone):
                     ball.velocity = Vector2()
                     ball.pos = Vector2(self.model.start.point)
-                    ball.rect = ball.get_rect()
+                    ball.update()
 
             for collided_ball in self.balls:
                 if (
@@ -123,19 +126,33 @@ class Course:
                 ball.velocity.reflect_ip(Vector2(0, 1))
 
             for wall in self.walls:
-                collide = pg.sprite.collide_mask(wall, ball)
-                if collide is None:
-                    continue
-                (x1, y1), (x2, y2) = min(
-                    zip(wall.points, wall.points[-1:] + wall.points[:-1]),
-                    key=lambda line: abs(
-                        (line[1][0] - line[0][0]) * (line[0][1] - ball.pos.y)
-                        - (line[0][0] - ball.pos.x) * (line[1][1] - line[0][1])
-                    )
-                    / sqrt(
-                        (line[1][0] - line[0][0]) ** 2 + (line[1][1] - line[0][1]) ** 2
-                    ),
+                response = collision.Response()
+                wall_collider = collision.Poly(
+                    collision.Vector(wall.rect.x, wall.rect.y),
+                    [collision.Vector(p[0], p[1]) for p in wall.rel_points],
                 )
-                ball.velocity.reflect_ip(Vector2(y2 - y1, -(x2 - x1)))
+                ball_collider = collision.Circle(
+                    collision.Vector(ball.pos.x, ball.pos.y),
+                    ball.radius,
+                )
 
-            ball.update(time, friction)
+                if not collision.test_poly_circle(
+                    wall_collider,
+                    ball_collider,
+                    response,
+                ):
+                    continue
+
+                ball.velocity.reflect_ip(
+                    Vector2(response.overlap_v.x, response.overlap_v.y)
+                )
+
+            if ball.velocity.length() != 0:
+                acceleration = -ball.velocity.normalize() * friction * 9.8
+                ball.pos += ball.velocity * time + (acceleration * time**2) / 2
+                ball.velocity += acceleration
+
+                if ball.velocity.length() - acceleration.length() <= 0:
+                    ball.velocity = Vector2()
+
+                ball.update()

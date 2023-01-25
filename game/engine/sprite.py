@@ -1,3 +1,5 @@
+from typing import Any
+
 import pygame as pg
 
 
@@ -9,3 +11,6 @@ class Sprite(pg.sprite.Sprite):
         super().__init__()
         self.image = image.copy()
         self.rect = rect.copy()
+
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        raise NotImplementedError

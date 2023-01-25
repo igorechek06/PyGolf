@@ -13,34 +13,10 @@ course = Course(
         finish=models.Point(x=400, y=400),
         walls=[
             models.Wall(
-                color=models.Color(r=100, g=100, b=100),
-                polygon=[
-                    models.Point(x=206, y=336),
-                    models.Point(x=295, y=333),
-                    models.Point(x=307, y=245),
-                ],
-            ),
-            models.Wall(
-                color=models.Color(r=100, g=100, b=100),
-                polygon=[
-                    models.Point(x=208, y=388),
-                    models.Point(x=292, y=384),
-                    models.Point(x=291, y=497),
-                    models.Point(x=218, y=493),
-                    models.Point(x=215, y=461),
-                    models.Point(x=266, y=461),
-                    models.Point(x=265, y=414),
-                    models.Point(x=212, y=412),
-                ],
-            ),
-            models.Wall(
-                color=models.Color(r=100, g=100, b=100),
-                polygon=[
-                    models.Point(x=202, y=66),
-                    models.Point(x=190, y=172),
-                    models.Point(x=362, y=68),
-                    models.Point(x=353, y=164),
-                ],
+                start=models.Point(x=250, y=100),
+                end=models.Point(x=200, y=400),
+                color=models.Color(r=75, g=75, b=75),
+                width=100,
             ),
         ],
         zone=[
