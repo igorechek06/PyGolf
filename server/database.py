@@ -32,3 +32,6 @@ class Level(Base):
     course: Mapped[dict] = mapped_column(JSON)
 
     owner: Mapped[User] = relationship(User)
+
+
+Base.metadata.create_all(engine)
