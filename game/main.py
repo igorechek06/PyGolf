@@ -1,33 +1,59 @@
+import models
 import pygame as pg
-import ui
+from engine import Ball, Course
 
+screen = pg.display.set_mode((750, 750), pg.RESIZABLE)
 
-import game
-import editor
-
-pg.init()
-
-window = pg.display.set_mode((720, 720))
-clock = pg.time.Clock()
-
-play_button = ui.Button("Играть", 147, 335, 200, 50, 36)
-editor_button = ui.Button("Редактор", 388, 335, 200, 50, 36)
+course = Course(
+    60,
+    models.Course(
+        friction=0.2,
+        size=models.Size(width=500, height=500),
+        start=models.Point(x=100, y=100),
+        finish=models.Point(x=400, y=400),
+        walls=[
+            models.Wall(
+                start=models.Point(x=250, y=100),
+                end=models.Point(x=200, y=400),
+                color=models.Color(r=75, g=75, b=75),
+                width=100,
+            ),
+        ],
+        zone=[
+            models.DeadZone(
+                pos=models.Point(x=425, y=0),
+                size=models.Size(width=75, height=75),
+            ),
+            models.FrictionZone(
+                friction=2,
+                pos=models.Point(x=300, y=300),
+                size=models.Size(width=100, height=100),
+            ),
+        ],
+    ),
+)
+ball: Ball = course.add_ball()
 
 while True:
-    window.fill("black")
+    screen.fill("gray")
 
     for e in pg.event.get():
         if e.type == pg.QUIT:
             exit()
+        if e.type == pg.MOUSEBUTTONDOWN:
+            if e.button == 1:
+                ball.velocity += (
+                    pg.math.Vector2(
+                        e.pos[0] - ball.pos.x - 125, e.pos[1] - ball.pos.y - 125
+                    )
+                    * 2
+                )
 
-        if e.type == pg.MOUSEBUTTONUP and e.button == 1:
-            if play_button.rect.collidepoint(e.pos):
-                game.run(window)
-            if editor_button.rect.collidepoint(e.pos):
-                editor.run(window)
+            if e.button == 3:
+                ball = course.add_ball()
 
-    play_button.blit(window)
-    editor_button.blit(window)
+    game = course.render()
+    screen.blit(game, (125, 125))
 
-    pg.display.flip()
-    clock.tick(60)
+    course.update()
+    pg.display.update()

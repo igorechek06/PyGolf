@@ -1,4 +1,6 @@
 # isort: skip_file
-from . import course
+from .sprite import Sprite
 from .ball import Ball
-from .engine import Engine
+from .wall import Wall
+from .zone import Zone, FrictionZone, DeadZone
+from .course import Course

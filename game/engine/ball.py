@@ -1,53 +1,47 @@
-from math import sqrt
+from random import randint
 
 import pygame as pg
+import src
 from pygame.math import Vector2
 
+from . import Sprite
 
-class Ball:
+
+class Ball(Sprite):
     pos: Vector2
-    radius: float
+    radius: int
     mass: float
     velocity: Vector2
 
     def __init__(
         self,
-        x: float,
-        y: float,
-        radius: float,
+        pos: tuple[int, int],
+        radius: int,
         mass: float,
         velocity: Vector2 | None = None,
     ) -> None:
-        self.pos = Vector2(x, y)
+        self.pos = Vector2(pos)
         self.radius = radius
         self.mass = mass
         self.velocity = Vector2() if velocity is None else velocity
 
-    @property
-    def rect(self) -> pg.Rect:
-        return pg.Rect(
-            self.pos.x - self.radius,
-            self.pos.y - self.radius,
-            self.radius * 2,
-            self.radius * 2,
+        image = pg.surface.Surface((self.radius * 2, self.radius * 2), pg.SRCALPHA)
+        pg.draw.circle(
+            image,
+            (randint(0, 255), randint(0, 255), randint(0, 255)),
+            (self.radius, self.radius),
+            self.radius - 1,
+        )
+        image.blit(
+            pg.transform.scale(src.image.ball, image.get_size()),
+            (0, 0),
+        )
+        super().__init__(image, self.get_rect())
+
+    def get_rect(self) -> pg.rect.Rect:
+        return pg.rect.Rect(
+            self.pos - Vector2(self.radius), (self.radius * 2, self.radius * 2)
         )
 
-    def collide_ball(self, ball: "Ball") -> bool:
-        return (
-            ball is not self
-            and Vector2(self.pos - ball.pos).length() <= self.radius + ball.radius
-        )
-
-    def collide_line(
-        self,
-        line: tuple[tuple[int, int], tuple[int, int]],
-    ) -> bool:
-        return (
-            min(line[0][0], line[1][0]) <= self.pos.x <= max(line[0][0], line[1][0])
-            and min(line[0][1], line[1][1]) <= self.pos.y <= max(line[0][1], line[1][1])
-        ) and abs(
-            (line[1][0] - line[0][0]) * (line[0][1] - self.pos.y)
-            - (line[0][0] - self.pos.x) * (line[1][1] - line[0][1])
-        ) / sqrt(
-            (line[1][0] - line[0][0]) ** 2 + (line[1][1] - line[0][1]) ** 2
-        ) <= self.radius
+    def update(self) -> None:
+        self.rect = self.get_rect()
