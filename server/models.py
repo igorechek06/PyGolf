@@ -84,3 +84,9 @@ class Level(OrmModel):
     owner: User
     name: str
     course: Course
+
+
+class Score(OrmModel):
+    user: User
+    level: Level
+    score: int

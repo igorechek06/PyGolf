@@ -34,4 +34,14 @@ class Level(Base):
     owner: Mapped[User] = relationship(User)
 
 
+class Score(Base):
+    __tablename__ = "scores"
+    user_id: Mapped[int] = mapped_column(ForeignKey(User.id, ondelete="CASCADE"))
+    level_id: Mapped[int] = mapped_column(ForeignKey(Level.id, ondelete="CASCADE"))
+    score: Mapped[int]
+
+    user: Mapped[User] = relationship(User)
+    level: Mapped[Level] = relationship(Level)
+
+
 Base.metadata.create_all(engine)
