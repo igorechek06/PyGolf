@@ -24,6 +24,9 @@ collision = "^1.2.2"
 fastapi = "^0.89.1"
 pydantic = "^1.10.4"
 SQLAlchemy = "2b4"
+uvicorn = "^0.20.0"
+psycopg2 = "^2.9.5"
+PyJWT = "^2.6.0"
 
 
 [tool.mypy]

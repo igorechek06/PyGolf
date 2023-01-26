@@ -1,7 +1,6 @@
 import pygame as pg
 import src
-
-from . import Sprite
+from sprite import Sprite
 
 
 class Zone(Sprite):
@@ -28,10 +27,10 @@ class FrictionZone(Zone):
         pos: tuple[int, int],
         size: tuple[int, int],
     ) -> None:
-        super().__init__(pos, size, src.image.zone.friction)
+        super().__init__(pos, size, src.sprites.zone.friction)
         self.friction = friction
 
 
 class DeadZone(Zone):
     def __init__(self, pos: tuple[int, int], size: tuple[int, int]) -> None:
-        super().__init__(pos, size, src.image.zone.dead)
+        super().__init__(pos, size, src.sprites.zone.dead)

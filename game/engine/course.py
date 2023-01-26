@@ -5,8 +5,9 @@ import models
 import pygame as pg
 import src
 from pygame.math import Vector2
+from sprite import Sprite
 
-from . import Ball, DeadZone, FrictionZone, Sprite, Wall, Zone
+from . import Ball, DeadZone, FrictionZone, Wall, Zone
 
 
 def zone(zone: models.Zone) -> Zone:
@@ -22,7 +23,7 @@ class Finish(Sprite):
 
     def __init__(self, pos: tuple[int, int]) -> None:
         super().__init__(
-            src.image.finish, pg.rect.Rect(pos, src.image.finish.get_size())
+            src.sprites.finish, pg.rect.Rect(pos, src.sprites.finish.get_size())
         )
         self.pos = pos
 

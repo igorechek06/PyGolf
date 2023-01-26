@@ -2,7 +2,7 @@ import pygame as pg
 import src
 from pygame.math import Vector2
 
-from . import Sprite
+from sprite import Sprite
 
 
 class Ball(Sprite):
@@ -34,7 +34,7 @@ class Ball(Sprite):
             self.radius - 1,
         )
         image.blit(
-            pg.transform.scale(src.image.ball, image.get_size()),
+            pg.transform.scale(src.sprites.ball, image.get_size()),
             (0, 0),
         )
         super().__init__(image, self.get_rect())

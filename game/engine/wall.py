@@ -1,8 +1,7 @@
 from math import cos, sin, sqrt
 
 import pygame as pg
-
-from . import Sprite
+from sprite import Sprite
 
 x, y = lambda p: p[0], lambda p: p[1]
 

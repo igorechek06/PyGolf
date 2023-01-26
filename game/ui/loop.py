@@ -9,7 +9,7 @@ EVENT = Callable[[pg.event.Event], None]
 class GameLoop(Generic[S]):
     loop: Callable[S, None]
     finish: Callable[S, None] | None
-    event_handlers: dict[int | None, list[EVENT]]
+    event_handlers: dict[int, list[EVENT]]
 
     def __init__(
         self,
@@ -20,12 +20,12 @@ class GameLoop(Generic[S]):
         self.finish = finish
         self.event_handlers = {}
 
-    def add_event_handler(self, func: EVENT, event_type: int | None = None) -> None:
+    def add_event_handler(self, func: EVENT, event_type: int) -> None:
         if event_type not in self.event_handlers:
             self.event_handlers[event_type] = []
         self.event_handlers[event_type].append(func)
 
-    def event_handler(self, event_type: int | None = None) -> Callable[[EVENT], EVENT]:
+    def event_handler(self, event_type: int) -> Callable[[EVENT], EVENT]:
         def wrapper(func: EVENT) -> EVENT:
             self.add_event_handler(func, event_type)
             return func

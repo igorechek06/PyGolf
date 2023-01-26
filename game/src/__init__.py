@@ -1,3 +1,3 @@
 # isort: skip_file
-from . import image
+from . import sprites
 from . import music

@@ -1,38 +1,43 @@
 import pygame as pg
-from ui import Button, Font, GameLoop, Layout
+from sprite import Sprite
+from ui import Button, Field, GameLoop, Layout
 
 pg.init()
 
 screen = pg.display.set_mode((750, 750), pg.RESIZABLE)
-layout = Layout(screen.get_rect())
-play = Button(0, 0, "Play")
-editor = Button(0, 0, "Editor")
-close = Button(0, 0, "Close game")
-layout.add(play, editor, close)
+
+layout = Layout(pg.rect.Rect(0, 0, 400, 300))
+
+play = Button(pg.rect.Rect(0, 0, 200, 100), "Play")
+editor = Button(pg.rect.Rect(0, 0, 200, 100), "Editor")
+close = Button(pg.rect.Rect(0, 0, 200, 100), "Close")
+
+layout.add_widgets(play, editor, close)
 
 
-@play.add_handler
-def play_handler() -> None:
-    print("Play")
-
-
-@editor.add_handler
-def editor_handler() -> None:
-    print("Editor")
-
-
-@close.add_handler
-def close_handler() -> None:
-    exit()
-
-
-def loop(screen: pg.surface.Surface) -> None:
+@GameLoop
+def loop(screen: pg.surface.Surface, layout: Layout) -> None:
     screen.fill("black")
-    layout.rect = screen.get_rect()
-    layout.show(screen)
+    layout.rect.center = screen.get_rect().center
+    layout.update()
+    screen.blit(layout.image, layout.rect)
     pg.display.update()
 
 
-main_loop = GameLoop(loop)
-layout.connect_game_loop(main_loop)
-main_loop.start(screen)
+@play.on_click()
+def play_clicked() -> None:
+    print("Play")
+
+
+@editor.on_click()
+def editor_clicked() -> None:
+    print("Editor")
+
+
+@close.on_click()
+def close_clicked() -> None:
+    exit()
+
+
+layout.register(loop)
+loop.start(screen, layout)
