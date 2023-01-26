@@ -1,4 +1,4 @@
-version: 3
+version: '3'
 
 services:
   pygolf-server:
@@ -8,9 +8,11 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
-      - DATABASE=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pygolf:5432/${POSTGRES_DB}
+      - DATABASE=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pygolf-database:5432/${POSTGRES_DB}
+      - SECRET=${SECRET}
+      - PORT=${PORT}
     ports:
-      - 5000:5000
+      - ${PORT}:${PORT}
 
   pygolf-database:
     image: postgres:bullseye

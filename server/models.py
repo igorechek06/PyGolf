@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import IntEnum, auto
 
 from pydantic import BaseModel
@@ -90,3 +91,4 @@ class Score(OrmModel):
     user: User
     level: Level
     score: int
+    date: datetime

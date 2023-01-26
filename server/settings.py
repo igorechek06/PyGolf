@@ -2,7 +2,7 @@ import pydantic
 
 
 class Settings(pydantic.BaseSettings):
-    database_url: str
+    database: str
     secret: str
 
 
