@@ -1,4 +1,5 @@
 from random import randint
+from typing import Callable
 
 import collision
 import models
@@ -41,6 +42,8 @@ class Course:
     zones: list[Zone]
     clock: pg.time.Clock
 
+    finish_handler: Callable[[Ball], None] | None
+
     def __init__(self, fps: int, model: models.Course) -> None:
         self.fps = fps
         self.model = model
@@ -53,6 +56,8 @@ class Course:
         ]
         self.zones = [zone(z) for z in model.zone]
         self.clock = pg.time.Clock()
+
+        self.finish_handler = None
 
     def render(self) -> pg.surface.Surface:
         surface = pg.surface.Surface(self.model.size.size)
@@ -73,6 +78,10 @@ class Course:
         )
         self.balls.append(ball)
         return ball
+
+    def on_finish(self, func: Callable[[Ball], None]) -> Callable[[Ball], None]:
+        self.finish_handler = func
+        return func
 
     def update_impulse(self, ball: Ball) -> None:
         for collided_ball in self.balls:
@@ -145,6 +154,11 @@ class Course:
 
     def update_ball(self, ball: Ball, time: float) -> None:
         friction = self.model.friction
+
+        if self.finish_handler is not None and self.finish.rect.collidepoint(
+            ball.rect.center
+        ):
+            self.finish_handler(ball)
 
         for zone in self.zones:
             if pg.sprite.collide_mask(zone, ball):

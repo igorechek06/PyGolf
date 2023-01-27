@@ -16,6 +16,7 @@ register = Button(RELATIVE, "Register")
 save = Button(RELATIVE, "Save")
 delete = Button(RELATIVE, "Delete")
 
+action_layout.add_widgets(login, register)
 layout.add_widgets(username, password, action_layout, back)
 
 
@@ -26,16 +27,6 @@ def account_loop(token: str | None) -> None:
     layout.update()
     screen.blit(layout.image, layout.rect)
     pg.display.update()
-
-
-@account_loop.set_setup
-def loop_setup(token: str | None) -> None:
-    action_layout.widgets.clear()
-    if token is None:
-        action_layout.add_widgets(login, register)
-    else:
-        action_layout.add_widgets(save, delete)
-    action_layout.register(account_loop)
 
 
 @back.on_click

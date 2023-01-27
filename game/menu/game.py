@@ -26,6 +26,20 @@ def game_loop(local_course: Course) -> None:
 @game_loop.set_setup
 def setup(local_course: Course) -> None:
     global ball, button, course
+
+    @local_course.on_finish
+    def finish(winner: Ball) -> None:
+        global ball
+        from menu import finish_loop
+
+        course.balls.remove(winner)
+
+        if len(course.balls) <= 0:
+            finish_loop.start()
+            pg.event.post(GameLoop.EXIT_EVENT)
+        else:
+            ball = course.balls[-1]
+
     course = local_course
     ball = course.add_ball()
 

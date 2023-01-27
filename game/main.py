@@ -32,41 +32,14 @@ def account_clicked() -> None:
 
 @play.on_click
 def play_clicked() -> None:
-    game_loop.start(
-        Course(
-            60,
-            models.Course(
-                friction=0.2,
-                size=models.Size(width=500, height=500),
-                start=models.Point(x=100, y=100),
-                finish=models.Point(x=400, y=400),
-                walls=[
-                    models.Wall(
-                        start=models.Point(x=250, y=100),
-                        end=models.Point(x=200, y=400),
-                        color=models.Color(r=75, g=75, b=75),
-                        width=100,
-                    ),
-                ],
-                zone=[
-                    models.DeadZone(
-                        pos=models.Point(x=425, y=0),
-                        size=models.Size(width=75, height=75),
-                    ),
-                    models.FrictionZone(
-                        friction=2,
-                        pos=models.Point(x=300, y=300),
-                        size=models.Size(width=100, height=100),
-                    ),
-                ],
-            ),
-        )
-    )
+    game_loop.start(Course(60, models.Course.parse_file("map.pygolf")))
 
 
 @editor.on_click
 def editor_clicked() -> None:
-    print("Editor")
+    import editor
+
+    editor.editor_loop.start()
 
 
 @close.on_click
