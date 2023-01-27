@@ -2,5 +2,5 @@
 from . import zone
 from pygame.image import load
 
-ball = load("./src/image/ball.svg")
-finish = load("./src/image/finish.svg")
+ball = load("./src/sprites/ball.svg")
+finish = load("./src/sprites/finish.svg")

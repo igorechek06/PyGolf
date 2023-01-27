@@ -47,3 +47,6 @@ class Wall(Sprite):
         pg.draw.polygon(image, self.color, self.rel_points)
 
         super().__init__(image, rect)
+
+    def update(self) -> None:
+        pass

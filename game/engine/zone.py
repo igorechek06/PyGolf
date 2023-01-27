@@ -17,6 +17,9 @@ class Zone(Sprite):
         self.pos = pos
         self.size = size
 
+    def update(self) -> None:
+        pass
+
 
 class FrictionZone(Zone):
     friction: float

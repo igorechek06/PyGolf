@@ -1,17 +1,15 @@
 from enum import Enum, auto
 
 import pygame as pg
-from sprite import Sprite
 
 from . import GameLoop, Widget
 
 
-class Mode(Enum):
-    HORIZONTAL = auto()
-    VERTICAL = auto()
-
-
 class Layout(Widget):
+    class Mode(Enum):
+        HORIZONTAL = auto()
+        VERTICAL = auto()
+
     mode: Mode
     padding: int
     widgets: list[Widget]
@@ -20,7 +18,7 @@ class Layout(Widget):
         self,
         rect: pg.rect.Rect,
         mode: Mode = Mode.HORIZONTAL,
-        padding: int = 5,
+        padding: int = 2,
     ) -> None:
         super().__init__(rect)
 
@@ -44,16 +42,14 @@ class Layout(Widget):
         if len(self.widgets) <= 0:
             return
 
-        if self.mode == Mode.HORIZONTAL:
-            height = (
-                self.rect.height // len(self.widgets)
-                - (len(self.widgets) - 1) * self.padding
-            )
+        padding = self.padding * (len(self.widgets) - 1)
+        if self.mode == self.Mode.HORIZONTAL:
+            height = self.rect.height // len(self.widgets)
             for n, widget in enumerate(self.widgets):
                 widget.rect.x = self.rect.x
                 widget.rect.y = self.rect.y
                 widget.rect.width = self.rect.width
-                widget.rect.height = height
+                widget.rect.height = height - padding
 
                 rel_rect = widget.rel_rect
                 rel_rect.x = 0
@@ -62,15 +58,12 @@ class Layout(Widget):
 
                 widget.update()
                 self.image.blit(widget.image, rel_rect)
-        elif self.mode == Mode.VERTICAL:
-            width = (
-                self.rect.width // len(self.widgets)
-                - (len(self.widgets) - 1) * self.padding
-            )
+        elif self.mode == self.Mode.VERTICAL:
+            width = self.rect.width // len(self.widgets)
             for n, widget in enumerate(self.widgets):
                 widget.rect.x = self.rect.x
                 widget.rect.y = self.rect.y
-                widget.rect.width = width
+                widget.rect.width = width - padding
                 widget.rect.height = self.rect.height
 
                 rel_rect = widget.rel_rect

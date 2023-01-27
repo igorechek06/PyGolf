@@ -27,6 +27,9 @@ class Finish(Sprite):
         )
         self.pos = pos
 
+    def update(self) -> None:
+        pass
+
 
 class Course:
     fps: int
@@ -137,7 +140,7 @@ class Course:
             ):
                 continue
             edge = Vector2(response.overlap_v.x, response.overlap_v.y)
-            if edge.length() != 0:
+            if ball.velocity.length() != 0 and edge.length() != 0:
                 ball.velocity.reflect_ip(edge)
 
     def update_ball(self, ball: Ball, time: float) -> None:

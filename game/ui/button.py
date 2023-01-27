@@ -4,14 +4,14 @@ import pygame as pg
 
 from . import Font, GameLoop, Widget
 
-FUNC = Callable[[], None]
-
 
 class Button(Widget):
+    ON_CLICK = Callable[[], None]
+
     text: str
     font: Font
 
-    on_click_handler: FUNC | None
+    on_click_handler: ON_CLICK | None
 
     def __init__(self, rect: pg.rect.Rect, text: str, font: Font | None = None) -> None:
         super().__init__(rect)
@@ -23,12 +23,9 @@ class Button(Widget):
 
         self.update()
 
-    def on_click(self) -> Callable[[FUNC], FUNC]:
-        def wrapper(func: FUNC) -> FUNC:
-            self.on_click_handler = func
-            return func
-
-        return wrapper
+    def on_click(self, func: ON_CLICK) -> ON_CLICK:
+        self.on_click_handler = func
+        return func
 
     def register(self, loop: GameLoop) -> GameLoop:
         def mouse_event(event: pg.event.Event) -> None:

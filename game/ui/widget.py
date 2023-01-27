@@ -5,6 +5,8 @@ from sprite import Sprite
 
 from . import GameLoop
 
+RELATIVE = pg.rect.Rect(0, 0, 0, 0)
+
 
 class Widget(Sprite, ABC):
     def __init__(self, rect: pg.rect.Rect) -> None:

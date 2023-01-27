@@ -1,43 +1,78 @@
+import keyring
+import models
 import pygame as pg
-from sprite import Sprite
-from ui import Button, Field, GameLoop, Layout
+from engine import Course
+from menu import account_loop, game_loop
+from screen import screen
+from ui import RELATIVE, Button, GameLoop, Layout
 
-pg.init()
+main_layout = Layout(pg.rect.Rect(0, 0, 400, 300))
 
-screen = pg.display.set_mode((750, 750), pg.RESIZABLE)
+account = Button(RELATIVE, "Account")
+play = Button(RELATIVE, "Play")
+editor = Button(RELATIVE, "Editor")
+close = Button(RELATIVE, "Close")
 
-layout = Layout(pg.rect.Rect(0, 0, 400, 300))
-
-play = Button(pg.rect.Rect(0, 0, 200, 100), "Play")
-editor = Button(pg.rect.Rect(0, 0, 200, 100), "Editor")
-close = Button(pg.rect.Rect(0, 0, 200, 100), "Close")
-
-layout.add_widgets(play, editor, close)
+main_layout.add_widgets(account, play, editor, close)
 
 
 @GameLoop
-def loop(screen: pg.surface.Surface, layout: Layout) -> None:
+def main_loop() -> None:
     screen.fill("black")
-    layout.rect.center = screen.get_rect().center
-    layout.update()
-    screen.blit(layout.image, layout.rect)
+    main_layout.rect.center = screen.get_rect().center
+    main_layout.update()
+    screen.blit(main_layout.image, main_layout.rect)
     pg.display.update()
 
 
-@play.on_click()
+@account.on_click
+def account_clicked() -> None:
+    account_loop.start(keyring.get_password("pygolf", "token"))
+
+
+@play.on_click
 def play_clicked() -> None:
-    print("Play")
+    game_loop.start(
+        Course(
+            60,
+            models.Course(
+                friction=0.2,
+                size=models.Size(width=500, height=500),
+                start=models.Point(x=100, y=100),
+                finish=models.Point(x=400, y=400),
+                walls=[
+                    models.Wall(
+                        start=models.Point(x=250, y=100),
+                        end=models.Point(x=200, y=400),
+                        color=models.Color(r=75, g=75, b=75),
+                        width=100,
+                    ),
+                ],
+                zone=[
+                    models.DeadZone(
+                        pos=models.Point(x=425, y=0),
+                        size=models.Size(width=75, height=75),
+                    ),
+                    models.FrictionZone(
+                        friction=2,
+                        pos=models.Point(x=300, y=300),
+                        size=models.Size(width=100, height=100),
+                    ),
+                ],
+            ),
+        )
+    )
 
 
-@editor.on_click()
+@editor.on_click
 def editor_clicked() -> None:
     print("Editor")
 
 
-@close.on_click()
+@close.on_click
 def close_clicked() -> None:
-    exit()
+    pg.event.post(GameLoop.EXIT_EVENT)
 
 
-layout.register(loop)
-loop.start(screen, layout)
+main_layout.register(main_loop)
+main_loop.start()
