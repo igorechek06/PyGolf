@@ -30,6 +30,7 @@ def account_loop(token: str | None) -> None:
 
 @account_loop.set_setup
 def loop_setup(token: str | None) -> None:
+    action_layout.widgets.clear()
     if token is None:
         action_layout.add_widgets(login, register)
     else:
